@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Fun Fact Generator</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #2d3748;
+    }
+
+    .app-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      padding: 30px 25px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .subtitle {
+      font-weight: 300;
+      color: #4a5568;
+      margin-bottom: 30px;
+      font-size: 1rem;
+    }
+
+    .fact-card {
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 25px 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 160px;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    .fact-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      color: #667eea;
+      user-select: none;
+      animation: bounce 3s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .fact-category {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: #764ba2;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .fact-category::after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 35px;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 1px;
+    }
+
+    .fact-text {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: #2d3748;
+      max-width: 400px;
+      user-select: none;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      padding: 15px 40px;
+      border-radius: 50px;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .refresh-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+    .refresh-btn:active {
+      transform: translateY(-2px);
+      box-shadow: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .app-container {
+        padding: 25px 20px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .fact-text {
+        font-size: 1.05rem;
+      }
+      .fact-icon {
+        font-size: 3.5rem;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .fact-text {
+        max-width: 300px;
+      }
+      .refresh-btn {
+        padding: 14px 30px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" role="main" aria-label="Daily fun fact generator app">
+    <h1>Daily Fun Fact Generator</h1>
+    <p class="subtitle">Discover something amazing every day!</p>
+    <div class="fact-card" id="fact-card" aria-live="polite" aria-atomic="true">
+      <span class="fact-icon" id="fact-icon" aria-hidden="true">🌟</span>
+      <div class="fact-category" id="fact-category">Welcome</div>
+      <p class="fact-text" id="fact-text">Click the button below to reveal a fun fact!</p>
+    </div>
+    <button class="refresh-btn" id="refresh-btn" type="button" aria-label="Get a new fun fact">Get Fun Fact</button>
+  </div>
+
+  <script>
+    const facts = [
+      { category: "Animals", icon: "🐙", text: "Octopuses have three hearts and blue blood. Two hearts pump blood to the gills, while the third pumps blood to the rest of the body!" },
+      { category: "Space", icon: "🪐", text: "A day on Venus is longer than its year! Venus takes 243 Earth days to rotate once, but only 225 Earth days to orbit the Sun." },
+      { category: "History", icon: "🏺", text: "Cleopatra lived closer in time to the Moon landing (1969) than to the construction of the Great Pyramid of Giza (2580 BC)." },
+      { category: "Animals", icon: "🦋", text: "Butterflies taste with their feet and smell with their antennae. They detect chemical signals from flowers this way!" },
+      { category: "Space", icon: "🌌", text: "There are more stars in the universe than grains of sand on all the beaches on Earth – an estimated 10^24 stars!" },
+      { category: "History", icon: "📜", text: "The shortest war in history lasted only 38-45 minutes between Britain and Zanzibar on August 27, 1896." },
+      { category: "Animals", icon: "🐘", text: "Elephants are one of the few animals that recognize themselves in a mirror, showing self-awareness like humans and dolphins." },
+      { category: "Space", icon: "☄️", text: "If you could drive a car straight up at highway speeds, it would take about an hour to reach space (100km altitude)." },
+      { category: "History", icon: "🗿", text: "The Great Wall of China isn't visible from space with the naked eye despite the popular myth." },
+      { category: "Animals", icon: "🐧", text: "Penguins have a gland that filters salt from seawater, allowing them to drink ocean water without dehydration." },
+      { category: "Space", icon: "🌙", text: "The Moon is gradually moving away from Earth about 3.8 cm per year – roughly the same rate your fingernails grow." },
+      { category: "History", icon: "🏛️", text: "Oxford University is older than the Aztec Empire. Oxford was founded about 1096, while Tenochtitlan was founded in 1325." },
+      { category: "Animals", icon: "🦆", text: "Ducks have waterproof feathers thanks to oil from a special gland which they spread with their beaks." },
+      { category: "Space", icon: "⭐", text: "Neutron stars are so dense that a teaspoon of neutron star material would weigh about 6 billion tons on Earth!" },
+      { category: "History", icon: "📺", text: "The first television commercial ever aired was for Bulova watches on July 1, 1941, costing only $9 to broadcast." },
+      { category: "Animals", icon: "🕷️", text: "Spider silk is stronger than steel by weight. Some spider webs are strong enough to catch small birds!" },
+      { category: "Space", icon: "🚀", text: "It takes about 8 minutes 20 seconds for light from the Sun to reach Earth, traveling at 186,000 miles per second." },
+      { category: "History", icon: "🍕", text: "Pizza Margherita was created in 1889 to honor Queen Margherita of Italy with tomato, mozzarella, and basil – colors of the Italian flag." },
+      { category: "Animals", icon: "🐨", text: "Koalas sleep up to 22 hours a day because eucalyptus leaves are hard to digest and low in nutrients." },
+      { category: "Space", icon: "🛰️", text: "There are over 34,000 pieces of space junk larger than 10cm orbiting Earth, traveling up to 17,500 mph!" }
+    ];
+    
+    let currentFactIndex = -1;
+    const factCard = document.getElementById('fact-card');
+    const iconEl = document.getElementById('fact-icon');
+    const categoryEl = document.getElementById('fact-category');
+    const textEl = document.getElementById('fact-text');
+    const btn = document.getElementById('refresh-btn');
+
+    function fadeOut(element, callback) {
+      element.style.opacity = 0;
+      setTimeout(callback, 400);
+    }
+
+    function fadeIn(element) {
+      element.style.opacity = 1;
+    }
+
+    function showNewFact() {
+      fadeOut(factCard, () => {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * facts.length);
+        } while (newIndex === currentFactIndex && facts.length > 1);
+        currentFactIndex = newIndex;
+        const fact = facts[currentFactIndex];
+        iconEl.textContent = fact.icon;
+        categoryEl.textContent = fact.category;
+        textEl.textContent = fact.text;
+        fadeIn(factCard);
+      });
+    }
+
+    // Load a fact on page load
+    window.addEventListener('DOMContentLoaded', showNewFact);
+
+    // Get new fact on button click
+    btn.addEventListener('click', showNewFact);
+
+    // Keyboard support for accessibility
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        showNewFact();
+      }
+    });
+  </script>
+</body>
+</html>
